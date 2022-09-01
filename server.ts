@@ -100,7 +100,30 @@ app.delete("/quotes/:id", (req, res) => {
 
   if (idToDelete > -1) {
     let deletedQuote = quotes.splice(idToDelete, 1)[0];
+    // from the array i get the first element [0] because splice returns an array with an object inside 
     res.send({ message: "quote deleted successfully", deletedQuote });
+  }
+});
+
+app.patch("/quotes/:id", (req, res) => {
+  // look for the quote
+  let id = Number(req.params.id);
+  let match = quotes.find((quote) => quote.id === id);
+
+  // if we find the quote:
+  if (match) {
+    if (req.body.quote) {
+      match.quote = req.body.quote;
+    }
+
+    if (req.body.authorId) {
+      match.authorId = req.body.ownerId;
+    }
+
+    res.send(match);
+  } else {
+    // if we don't find the quote:
+    res.status(404).send({ error: "quote not found." });
   }
 });
 
