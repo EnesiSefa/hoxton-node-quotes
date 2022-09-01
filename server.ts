@@ -117,7 +117,7 @@ app.patch("/quotes/:id", (req, res) => {
     }
 
     if (req.body.authorId) {
-      match.authorId = req.body.ownerId;
+      match.authorId = req.body.authorId;
     }
 
     res.send(match);
