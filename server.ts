@@ -94,9 +94,16 @@ app.post("/authors", (req, res) => {
     res.status(400).send({ errors: errors });
   }
 });
+app.delete("/quotes/:id", (req, res) => {
+  const foundId = Number(req.params.id);
+  const idToDelete = authors.findIndex((author) => author.id === foundId);
 
-
+  if (idToDelete > -1) {
+    let deletedQuote = quotes.splice(idToDelete, 1)[0];
+    res.send({ message: "quote deleted successfully", deletedQuote });
+  }
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port http://localhost:${port}`);
-})
+});

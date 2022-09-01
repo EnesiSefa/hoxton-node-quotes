@@ -49,4 +49,5 @@ export const quotes = [
     quote:
       "Humanity is OK, but 99% of people are boring idiots.”",
   },
+  
 ];
