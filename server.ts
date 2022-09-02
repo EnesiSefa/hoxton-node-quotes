@@ -8,12 +8,17 @@ app.use(cors());
 app.get("/", (req, res) => {
   res.send(``);
 });
+app.get("/testing", (req, res) => {
+  res.send("<div>hi</div>");
+});
+
 app.get("/quotes", (req, res) => {
   res.send(quotes);
 });
 app.get("/authors", (req, res) => {
   res.send(authors);
 });
+
 app.get("/quotes/:id", (req, res) => {
   const id = Number(req.params.id);
   const match = quotes.find((item) => item.id === id);
@@ -24,6 +29,7 @@ app.get("/quotes/:id", (req, res) => {
     res.status(404).send({ error: "Item not found." });
   }
 });
+
 app.get("/authors/:id", (req, res) => {
   const id = Number(req.params.id);
   const match = quotes.find((item) => item.id === id);
@@ -99,8 +105,9 @@ app.delete("/quotes/:id", (req, res) => {
   const idToDelete = authors.findIndex((author) => author.id === foundId);
 
   if (idToDelete > -1) {
+    // -1 means the object that doesnt exist
     let deletedQuote = quotes.splice(idToDelete, 1)[0];
-    // from the array i get the first element [0] because splice returns an array with an object inside 
+    // from the array i get the first element [0] because splice returns an array with an object inside
     res.send({ message: "quote deleted successfully", deletedQuote });
   }
 });
