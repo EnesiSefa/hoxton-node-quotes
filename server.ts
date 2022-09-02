@@ -99,7 +99,7 @@ app.post("/authors", (req, res) => {
     // if there are any errors...
     res.status(400).send({ errors: errors });
   }
-});
+});///
 app.delete("/quotes/:id", (req, res) => {
   const foundId = Number(req.params.id);
   const idToDelete = authors.findIndex((author) => author.id === foundId);
