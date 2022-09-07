@@ -1,10 +1,66 @@
 import express from "express";
 import cors from "cors";
 import { quotes, authors } from "./data";
+import Database from "better-sqlite3";
+
+const db = Database("./db/data.db", { verbose: console.log });
 
 const app = express();
 const port = 4000;
 app.use(cors());
+
+function authorsFunction() {
+  const createAuthorsTable = db.prepare(`
+CREATE TABLE IF NOT EXISTS authors (
+    id INTEGER ,
+    firstName TEXT,
+    lastName TEXT,
+    age INTEGER,
+    photo TEXT,
+    PRIMARY KEY (id)
+);`);
+  createAuthorsTable.run();
+  const deleteTable = db.prepare(`
+  DROP TABLE IF EXISTS authors
+  `);
+  deleteTable.run();
+  const createAuthors = db.prepare(`
+  INSERT INTO authors (firstName,lastName,age,photo) VALUES (?, ?,?,?);
+  `);
+  for (let person of authors) {
+    createAuthors.run(
+      person.firstName,
+      person.lastName,
+      person.age,
+      person.photo
+    );
+  }
+}
+authorsFunction();
+
+function quotesFunction() {
+  const createQuotesTable = db.prepare(`
+CREATE TABLE IF NOT EXISTS quotes (
+    id INTEGER ,
+    authorId INTEGER,
+    quote TEXT,
+    PRIMARY KEY (id)
+);`);
+  createQuotesTable.run();
+  const deleteTable = db.prepare(`
+  DROP TABLE IF EXISTS quotes
+  `);
+  deleteTable.run();
+  const createQuotes = db.prepare(`
+  INSERT INTO quotes (authorId,quote) VALUES (?, ?);
+  `);
+  for (let quote of quotes) {
+    createQuotes.run(quote.authorId, quote.quote);
+  }
+}
+
+quotesFunction();
+
 app.get("/", (req, res) => {
   res.send(``);
 });
@@ -40,6 +96,7 @@ app.get("/authors/:id", (req, res) => {
     res.status(404).send({ error: "Item not found." });
   }
 });
+
 app.post("/quotes", (req, res) => {
   let errors: string[] = [];
 
@@ -65,6 +122,7 @@ app.post("/quotes", (req, res) => {
     res.status(400).send({ errors: errors });
   }
 });
+
 app.post("/authors", (req, res) => {
   let errors: string[] = [];
 
@@ -99,7 +157,7 @@ app.post("/authors", (req, res) => {
     // if there are any errors...
     res.status(400).send({ errors: errors });
   }
-});///
+}); ///
 app.delete("/quotes/:id", (req, res) => {
   const foundId = Number(req.params.id);
   const idToDelete = authors.findIndex((author) => author.id === foundId);
@@ -119,13 +177,9 @@ app.patch("/quotes/:id", (req, res) => {
 
   // if we find the quote:
   if (match) {
-    if (req.body.quote) {
-      match.quote = req.body.quote;
-    }
+    if (req.body.quote) match.quote = req.body.quote;
 
-    if (req.body.authorId) {
-      match.authorId = req.body.authorId;
-    }
+    if (req.body.authorId) match.authorId = req.body.authorId;
 
     res.send(match);
   } else {
